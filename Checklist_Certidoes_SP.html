@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Certidoes Millare</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+  const GOOGLE_CLIENT_ID = '464615973702-sndoggaog5sn0f64vitb9aomj7dnfihu.apps.googleusercontent.com';
+  const DRIVE_FILE_NAME  = 'checklist_certidoes_millare.json';
+</script>
+<style>
+:root{--azul:#1B3A6B;--azul-m:#2E6DB4;--azul-cl:#D9E8F5;--verde:#1B6B35;--verde-cl:#E8F5EE;--cinza:#F4F6F9;--cinza-m:#E2E8F0;--txt:#1A1A2E;--txt2:#4A5568;--branco:#FFFFFF;--sombra:0 4px 24px rgba(27,58,107,.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#EEF2F8;color:var(--txt);min-height:100vh;padding-bottom:60px}
+.header{background:var(--azul);padding:18px 36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(27,58,107,.25);gap:14px;flex-wrap:wrap}
+.header-left h1{font-family:'DM Serif Display',serif;color:#fff;font-size:19px;font-weight:400}
+.header-left p{color:rgba(255,255,255,.6);font-size:12px;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.progress-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:30px;padding:6px 16px;color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.progress-badge .count{font-family:'DM Serif Display',serif;font-size:19px}
+.btn-google{display:flex;align-items:center;gap:7px;background:#fff;color:#3c4043;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;box-shadow:0 1px 6px rgba(0,0,0,.15);transition:box-shadow .2s;white-space:nowrap}
+.btn-google:hover{box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.save-status{font-size:11.5px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px;min-width:120px}
+.save-status.saved{color:#86efac}.save-status.saving{color:#fde68a}.save-status.error{color:#fca5a5}
+.btn-reset{background:transparent;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.7);border-radius:8px;padding:6px 13px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-reset:hover{background:rgba(255,255,255,.1);color:#fff}
+.progress-bar-wrap{background:var(--azul-m);height:4px}
+.progress-bar{height:4px;background:#4ADE80;transition:width .5s cubic-bezier(.4,0,.2,1);width:0%}
+
+.setup-banner{background:#FFF8E7;border-left:4px solid #E8A020;margin:18px 22px 0;border-radius:10px;padding:14px 18px;display:none}
+.setup-banner.show{display:block}
+.setup-banner h3{color:#92400e;font-size:13px;margin-bottom:6px}
+.setup-banner p{color:#78350f;font-size:12px;line-height:1.5}
+.setup-banner code{background:#fef3c7;padding:1px 5px;border-radius:3px;font-size:11px;color:#92400e}
+.setup-banner ol{margin:7px 0 0 16px;color:#78350f;font-size:12px;line-height:1.9}
+
+.main{max-width:900px;margin:0 auto;padding:26px 22px 0}
+.info-card{background:#fff;border-radius:14px;padding:20px 24px;margin-bottom:22px;box-shadow:var(--sombra);border-left:5px solid var(--azul-m)}
+.info-card h2{font-family:'DM Serif Display',serif;font-size:16px;color:var(--azul);margin-bottom:14px;font-weight:400}
+.info-section-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--azul);margin-bottom:9px;margin-top:3px}
+.info-divider{border:none;border-top:1px solid var(--cinza-m);margin:12px 0}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.info-field label{display:block;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--azul-m);margin-bottom:4px}
+.info-field input,.info-field select{width:100%;border:1.5px solid var(--cinza-m);border-radius:8px;padding:8px 11px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--txt);background:var(--cinza);transition:border-color .2s;outline:none}
+.info-field input:focus,.info-field select:focus{border-color:var(--azul-m);background:#fff}
+.info-field select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232E6DB4' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+.info-field.full{grid-column:1/-1}
+.section-label{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--azul-m);margin-bottom:9px;padding-left:3px}
+
+.certidao{background:#fff;border-radius:13px;margin-bottom:7px;box-shadow:0 2px 12px rgba(27,58,107,.07);display:flex;align-items:stretch;overflow:hidden;transition:box-shadow .25s,transform .2s;border:1.5px solid transparent;cursor:pointer}
+.certidao:hover{box-shadow:var(--sombra);transform:translateY(-1px)}
+.certidao.done{background:var(--verde-cl);border-color:#86EFAC}
+.certidao.done .cert-content{opacity:.75}
+.cert-num{background:var(--azul);color:#fff;font-family:'DM Serif Display',serif;font-size:15px;width:48px;min-width:48px;display:flex;align-items:center;justify-content:center;transition:background .25s}
+.certidao.done .cert-num{background:var(--verde)}
+.cert-check-wrap{display:flex;align-items:center;justify-content:center;padding:0 13px}
+.cert-check{width:21px;height:21px;border-radius:6px;border:2px solid var(--cinza-m);background:var(--cinza);display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.4,0,.2,1);flex-shrink:0}
+.cert-check svg{opacity:0;transform:scale(.5);transition:all .2s}
+.certidao.done .cert-check{background:var(--verde);border-color:var(--verde)}
+.certidao.done .cert-check svg{opacity:1;transform:scale(1)}
+.cert-content{flex:1;padding:13px 17px 11px;border-left:3px solid var(--azul-cl);transition:all .2s}
+.certidao.done .cert-content{border-left-color:#86EFAC}
+.cert-titulo{font-size:13.5px;font-weight:600;color:var(--azul);margin-bottom:5px;line-height:1.35}
+.certidao.done .cert-titulo{text-decoration:line-through;color:#2D6A4F}
+.cert-meta{display:flex;flex-wrap:wrap;gap:3px 14px;margin-bottom:6px}
+.cert-tag{font-size:11px;display:flex;align-items:center;gap:4px;color:var(--txt2)}
+.cert-tag.green{color:var(--verde);font-weight:500}
+.cert-link a{font-size:11.5px;color:#1558C0;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;background:#EEF4FF;border-radius:5px;transition:background .15s}
+.cert-link a:hover{background:#DBEAFE}
+.cert-link.no-link{font-size:11.5px;color:#666;font-style:italic}
+
+.done-banner{background:linear-gradient(135deg,#1B6B35,#2E7D32);border-radius:13px;padding:22px 26px;margin-top:22px;text-align:center;display:none;box-shadow:0 8px 32px rgba(27,107,53,.25)}
+.done-banner.show{display:block;animation:popIn .4s cubic-bezier(.4,0,.2,1)}
+.done-banner h2{font-family:'DM Serif Display',serif;color:#fff;font-size:22px;margin-bottom:6px}
+.done-banner p{color:rgba(255,255,255,.8);font-size:13px}
+@keyframes popIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Checklist de Certidoes — Venda de Imovel</h1>
+    <p>Millare Consultoria Imobiliaria · Sao Paulo – Capital</p>
+  </div>
+  <div class="header-right">
+    <div class="save-status" id="saveStatus">&#9711; Nao conectado</div>
+    <button class="btn-google" id="btnGoogle" onclick="handleAuthClick()">
+      <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <span id="btnGoogleLabel">Entrar com Google</span>
+    </button>
+    <div class="progress-badge"><span class="count" id="countDone">0</span><span>/ 10</span></div>
+    <button class="btn-reset" onclick="resetAll()">&#8634; Limpar</button>
+  </div>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="setup-banner" id="setupBanner">
+  <h3>&#9881; Configure o Client ID do Google para salvar no Drive</h3>
+  <p>Abra este arquivo HTML em um editor de texto e substitua <code>SEU_CLIENT_ID_AQUI.apps.googleusercontent.com</code> pelo seu Client ID:</p>
+  <ol>
+    <li>Acesse <strong>console.cloud.google.com</strong> e crie um projeto</li>
+    <li>APIs e Servicos → Biblioteca → ative <strong>Google Drive API</strong></li>
+    <li>Credenciais → Criar → ID do cliente OAuth 2.0 → Aplicativo da Web</li>
+    <li>Em "Origens JS autorizadas" adicione: <code>null</code> (arquivo local) e <code>https://drive.google.com</code></li>
+    <li>Copie o <strong>ID do cliente</strong> e cole no inicio do arquivo HTML</li>
+  </ol>
+</div>
+
+<div class="main">
+  <div class="info-card">
+    <h2>Dados do Processo</h2>
+    <div class="info-section-label">Imovel</div>
+    <div class="info-grid">
+      <div class="info-field full"><label>Endereco do Imovel</label><input type="text" id="imovel" placeholder="Endereco completo" oninput="scheduleAutoSave()"></div>
+      <div class="info-field"><label>Matricula / SQL</label><input type="text" id="matricula" placeholder="N do SQL" oninput="scheduleAutoSave()"></div>
+      <div class="info-field"><label>Codigo do Imovel</label><input type="text" id="codigo" placeholder="Codigo interno" oninput="scheduleAutoSave()"></div>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-section-label">Vendedor</div>
+    <div class="info-grid">
+      <div class="info-field"><label>Nome do Vendedor</label><input type="text" id="vendedor" placeholder="Nome completo" oninput="scheduleAutoSave()"></div>
+      <div class="info-field"><label>CPF do Vendedor</label><input type="text" id="cpf" placeholder="000.000.000-00" oninput="scheduleAutoSave()"></div>
+    </div>
+    <div class="info-divider"></div>
+    <div class="info-section-label">Comprador</div>
+    <div class="info-grid">
+      <div class="info-field"><label>Nome do Comprador</label><input type="text" id="comprador" placeholder="Nome completo" oninput="scheduleAutoSave()"></div>
+      <div class="info-field"><label>CPF do Comprador</label><input type="text" id="cpf_comprador" placeholder="000.000.000-00" oninput="scheduleAutoSave()"></div>
+      <div class="info-field full"><label>Forma de Pagamento</label>
+        <select id="pagamento" onchange="scheduleAutoSave()">
+          <option value="">Selecione...</option>
+          <option>A vista</option><option>Financiamento bancario</option>
+          <option>FGTS</option><option>Financiamento + FGTS</option>
+          <option>Permuta</option><option>Consorcio</option><option>Outra</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Certidoes — clique para marcar como solicitada</div>
+  <div id="lista"></div>
+  <div class="done-banner" id="doneBanner">
+    <h2>Todas as certidoes foram solicitadas!</h2>
+    <p>Processo completo — aguarde o retorno de cada certidao para finalizar a transacao.</p>
+  </div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const certidoes=[
+  {num:"I",titulo:"Certidao Atualizada de Matricula do Imovel",acesso:"Login: conta da imobiliaria - ONR / ARISP",necessario:"Necessario: numero da matricula do imovel",url:"https://registrodeimoveis.org.br/",urlTexto:"registrodeimoveis.org.br"},
+  {num:"II",titulo:"Certidao Negativa de Debitos Imobiliarios (IPTU)",acesso:"Login: conta da imobiliaria na Prefeitura SP (CNPJ)",necessario:"Necessario: numero do SQL do imovel",url:"https://duc.prefeitura.sp.gov.br/certidoes/forms_anonimo/frmconsultaemissaocertificado.aspx",urlTexto:"duc.prefeitura.sp.gov.br"},
+  {num:"III",titulo:"Certidao de Dados Cadastrais",acesso:"Login: conta da imobiliaria na Prefeitura SP (CNPJ)",necessario:"Necessario: SQL + Senha Web",url:"http://notcertiptu.prefeitura.sp.gov.br/PaginasRestritas/frm003_Gerar_Cert_Dados_Cad.aspx",urlTexto:"notcertiptu.prefeitura.sp.gov.br"},
+  {num:"IV",titulo:"Certidao Negativa - Distribuidores Civeis (10 anos)",acesso:"Sem login - consulta publica pelo CPF do vendedor",necessario:"Necessario: CPF e/ou CNPJ · periodo 10 anos",url:"https://www.tjsp.jus.br/Certidoes",urlTexto:"tjsp.jus.br - Certidoes Civeis"},
+  {num:"V",titulo:"Certidao Negativa - Executivos Fiscais (10 anos)",acesso:"Sem login - consulta publica pelo CPF do vendedor",necessario:"Necessario: CPF e/ou CNPJ · periodo 10 anos",url:"https://www.tjsp.jus.br/Certidoes",urlTexto:"tjsp.jus.br - Certidoes"},
+  {num:"VI",titulo:"Certidao Negativa - Justica do Trabalho (CNDT)",acesso:"Login: conta gov.br da assistente da imobiliaria",necessario:"Necessario: CPF do vendedor para preencher na consulta",url:"https://cndt-certidao.tst.jus.br/",urlTexto:"cndt-certidao.tst.jus.br"},
+  {num:"VII",titulo:"Certidao Negativa - Justica Federal (TRF3)",acesso:"Sem login - consulta publica pelo CPF do vendedor",necessario:"Necessario: CPF e/ou CNPJ do vendedor",url:"https://web.trf3.jus.br/certidao-regional/",urlTexto:"web.trf3.jus.br - Certidao Regional"},
+  {num:"VIII",titulo:"Certidao Negativa - 10 Cartorios de Protestos (5 anos)",acesso:"Login: conta da imobiliaria no Protesto SP (vendas@millare.com.br)",necessario:"Necessario: CPF do vendedor · 5 anos · R$ 200,00",url:"https://www.protestosp.com.br/",urlTexto:"protestosp.com.br"},
+  {num:"IX",titulo:"Certidao Negativa - Receita Federal (CND)",acesso:"Sem login - consulta publica pelo CPF ou CNPJ",necessario:"Necessario: CPF do vendedor (PF) ou CNPJ (PJ)",url:"https://servicos.receitafederal.gov.br/servico/certidoes/",urlTexto:"servicos.receitafederal.gov.br - CND"},
+  {num:"X",titulo:"Declaracao de Quitacao de Condominio",acesso:"Solicitar a administradora ou sindico do condominio",necessario:"Necessario: identificacao da unidade · verificar app do condominio",url:null,urlTexto:null}
+];
+
+let accessToken=null,driveFileId=null,autoSaveTimer=null,memData={};
+const isConfigured=()=>!GOOGLE_CLIENT_ID.startsWith('SEU_CLIENT_ID');
+
+function handleAuthClick(){
+  if(!isConfigured()){document.getElementById('setupBanner').classList.add('show');document.getElementById('setupBanner').scrollIntoView({behavior:'smooth'});return;}
+  if(accessToken){signOut();return;}
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:GOOGLE_CLIENT_ID,
+    scope:'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file',
+    callback:async(resp)=>{
+      if(resp.error){setStatus('error','Erro ao autenticar');return;}
+      accessToken=resp.access_token;
+      document.getElementById('btnGoogleLabel').textContent='Sair do Google';
+      setStatus('saving','Carregando...');
+      await loadFromDrive();
+    }
+  });
+  client.requestAccessToken();
+}
+
+function signOut(){
+  if(accessToken)google.accounts.oauth2.revoke(accessToken,()=>{});
+  accessToken=null;driveFileId=null;
+  document.getElementById('btnGoogleLabel').textContent='Entrar com Google';
+  setStatus('','Nao conectado');
+}
+
+async function findDriveFile(){
+  const r=await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,{headers:{Authorization:`Bearer ${accessToken}`}});
+  const d=await r.json();
+  return d.files&&d.files.length>0?d.files[0].id:null;
+}
+
+async function loadFromDrive(){
+  try{
+    const id=await findDriveFile();
+    if(!id){driveFileId=null;setStatus('saved','Conta conectada (novo)');renderAll();return;}
+    driveFileId=id;
+    const r=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,{headers:{Authorization:`Bearer ${accessToken}`}});
+    memData=await r.json();
+    setStatus('saved','Dados carregados');
+    renderAll();
+  }catch(e){setStatus('error','Erro ao carregar');}
+}
+
+async function saveToDrive(){
+  if(!accessToken)return;
+  setStatus('saving','Salvando...');
+  try{
+    collectFormData();
+    const blob=new Blob([JSON.stringify(memData)],{type:'application/json'});
+    const meta=JSON.stringify({name:DRIVE_FILE_NAME,parents:['appDataFolder']});
+    let res;
+    if(driveFileId){
+      const form=new FormData();
+      form.append('metadata',new Blob([JSON.stringify({})],{type:'application/json'}));
+      form.append('file',blob);
+      res=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`,{method:'PATCH',headers:{Authorization:`Bearer ${accessToken}`},body:form});
+    }else{
+      const form=new FormData();
+      form.append('metadata',new Blob([meta],{type:'application/json'}));
+      form.append('file',blob);
+      res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:`Bearer ${accessToken}`},body:form});
+      const created=await res.json();
+      driveFileId=created.id;
+    }
+    setStatus('saved','Salvo no Drive');
+  }catch(e){setStatus('error','Erro ao salvar');}
+}
+
+function scheduleAutoSave(){
+  clearTimeout(autoSaveTimer);
+  if(accessToken)setStatus('saving','Aguardando...');
+  autoSaveTimer=setTimeout(()=>{if(accessToken)saveToDrive();else collectFormData();},1500);
+}
+
+function collectFormData(){
+  memData.imovel=document.getElementById('imovel').value;
+  memData.matricula=document.getElementById('matricula').value;
+  memData.codigo=document.getElementById('codigo').value;
+  memData.vendedor=document.getElementById('vendedor').value;
+  memData.cpf=document.getElementById('cpf').value;
+  memData.comprador=document.getElementById('comprador').value;
+  memData.cpf_comprador=document.getElementById('cpf_comprador').value;
+  memData.pagamento=document.getElementById('pagamento').value;
+}
+
+function setStatus(type,msg){const el=document.getElementById('saveStatus');el.className='save-status '+(type||'');el.textContent=msg;}
+
+function toggleCert(idx){if(!memData.checks)memData.checks={};memData.checks[idx]=!memData.checks[idx];scheduleAutoSave();renderList();}
+
+function resetAll(){if(!confirm('Limpar todo o progresso desta lista?'))return;memData.checks={};scheduleAutoSave();renderList();}
+
+function fillForm(){
+  const d=memData,set=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
+  set('imovel',d.imovel);set('matricula',d.matricula);set('codigo',d.codigo);
+  set('vendedor',d.vendedor);set('cpf',d.cpf);
+  set('comprador',d.comprador);set('cpf_comprador',d.cpf_comprador);set('pagamento',d.pagamento);
+}
+
+function renderList(){
+  const checks=memData.checks||{};
+  const done=Object.values(checks).filter(Boolean).length;
+  document.getElementById('countDone').textContent=done;
+  document.getElementById('progressBar').style.width=(done/10*100)+'%';
+  document.getElementById('doneBanner').classList.toggle('show',done===10);
+  document.getElementById('lista').innerHTML=certidoes.map((c,i)=>{
+    const isDone=!!checks[i];
+    const linkHtml=c.url
+      ?`<div class="cert-link"><a href="${c.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">&#128279; ${c.urlTexto} &#8599;</a></div>`
+      :`<div class="cert-link no-link">Solicitar diretamente a administradora/sindico</div>`;
+    return`<div class="certidao ${isDone?'done':''}" onclick="toggleCert(${i})">
+      <div class="cert-num">${c.num}</div>
+      <div class="cert-check-wrap"><div class="cert-check"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="cert-content">
+        <div class="cert-titulo">${c.titulo}</div>
+        <div class="cert-meta"><span class="cert-tag green">${c.acesso}</span><span class="cert-tag">${c.necessario}</span></div>
+        ${linkHtml}
+      </div></div>`;
+  }).join('');
+}
+
+function renderAll(){fillForm();renderList();}
+if(!isConfigured())document.getElementById('setupBanner').classList.add('show');
+renderAll();
+</script>
+</body>
+</html>
